@@ -1,0 +1,8 @@
+name: fairfare-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.17
+  - pip
+  - poetry
