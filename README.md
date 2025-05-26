@@ -1,0 +1,1 @@
+A vibe coding project for splitting expenses within a friend group / family
