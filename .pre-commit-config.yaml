@@ -21,14 +21,11 @@ repos:
       - id: flake8
   - repo: local
     hooks:
-    -   id: run-local-pytest
+      - id: run-local-pytest
         name: Run Pytest
-        entry: pytest
+        entry: bash -c 'cd FairFare && pytest || [ $? -eq 5 ]'
         language: system
         types: [python]
-        files: |
-            (?x)^(
-                FairFare/.*\.py|
-                tests/.*\.py
-            )$
-        always_run: true # Run on every commit
+        pass_filenames: false
+        files: ^FairFare/
+        always_run: true

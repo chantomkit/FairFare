@@ -20,7 +20,7 @@ def exact_split(
     """
     Split `total` according to exact shares provided in `participant_shares`.
     :param total: Total amount to be split.
-    :param participant_shares: Mapping from participant id to their exact share.
+    :param participant_shares: Mapping participant id to their exact share.
     :return: Mapping from participant id to owed share amounts.
     """
     print(total, participant_shares, sum(participant_shares.values()))
