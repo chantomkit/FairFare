@@ -1,5 +1,5 @@
 from typing import List, Dict, Tuple
-from SplitExpress.strategies.mapping import SPLIT_METHODS_MAPPING
+from FairFare.strategies.mapping import SPLIT_METHODS_MAPPING
 import uuid
 from numbers import Number
 

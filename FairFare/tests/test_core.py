@@ -1,5 +1,5 @@
 import pytest
-from SplitExpress.core import ExpenseManager, Payment
+from FairFare.core import ExpenseManager, Payment
 
 # Helper to get name-id mapping from names
 @pytest.fixture
