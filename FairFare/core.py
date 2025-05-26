@@ -62,6 +62,15 @@ class Payment:
 class Settlement:
     @staticmethod
     def compute(people: Dict[str, Person]) -> List[Tuple[str, str, float]]:
+        """
+        Computes the net balances and returns a list of settlements.
+        Each settlement is a tuple (debtor_id, creditor_id, amount).
+        """
+        total_balance = sum(p.net_balance for p in people.values())
+        # Check if the total balance is zero
+        if abs(total_balance) > 1e-9:
+            raise ValueError(f"Invalid balances: total net balance is {total_balance}, must be zero")
+
         # prepare lists
         positives = [(p.id, p.net_balance) for p in people.values() if p.net_balance > 0]
         negatives = [(p.id, -p.net_balance) for p in people.values() if p.net_balance < 0]
