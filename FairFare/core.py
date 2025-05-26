@@ -1,48 +1,39 @@
 import uuid
+from dataclasses import dataclass, field
 from numbers import Number
 from typing import Dict
 
 
+@dataclass
 class Person:
-    def __init__(self, name: str):
-        self.id: str = str(uuid.uuid4())
-        self.name: str = name
-        self.net_balance: float = (
-            0.0  # Positive: should receive; Negative: should pay
-        )
+    name: str
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    net_balance: float = 0.0  # Positive: should receive; Negative: should pay
 
 
+@dataclass
 class Payment:
-    def __init__(
-        self,
-        participant_contributions: Dict[str, float],
-        participant_shares: Dict[str, float],
-        split_method: str = "even",  # Default to even split
-    ):
-        """
-        participant_contributions: mapping from person id to amount they paid
-        participants: list of person ids among whom to split the cost
-        split_method: 'even' (default)
-        """
-        self.participant_contributions = participant_contributions
-        self.participant_shares = participant_shares
-        # always compute total from contributions
-        self.total = sum(participant_contributions.values())
-        self.split_method = split_method
+    participant_contributions: Dict[str, float]
+    participant_shares: Dict[str, float]
+    split_method: str = "even"
+    total: float = field(init=False)
 
+    def __post_init__(self):
+        # compute total after initialization
+        self.total = sum(self.participant_contributions.values())
         self.validate()
 
     def validate(self):
         if self.total <= 0:
             raise ValueError("Total amount must be larger than 0.")
 
-        if not any(
+        if not all(
             isinstance(paid, Number)
             for paid in self.participant_contributions.values()
         ):
             raise ValueError("Paid values should be numeric.")
 
-        if not any(
+        if not all(
             isinstance(share, Number)
             for share in self.participant_shares.values()
         ):
