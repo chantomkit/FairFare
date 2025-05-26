@@ -1,17 +1,16 @@
 import pytest
-from FairFare.core import ExpenseManager, Payment
+from FairFare.core import Payment
+from FairFare.settler import ExpenseManager
 
 # Helper to get name-id mapping from names
 @pytest.fixture
 def expense_manager():
-    em = ExpenseManager()
-    alice = em.add_person("Alice")
-    bob = em.add_person("Bob")
-    charlie = em.add_person("Charlie")
-    return em, {"Alice": alice, "Bob": bob, "Charlie": charlie}
+    names = ["Alice", "Bob", "Charlie"]
+    em = ExpenseManager(names)
+    return em, {p.name: p.id for p in em.people.values()}
 
 
-def test_split_scenario(expense_manager):
+def test_settlement_scenario(expense_manager: tuple[ExpenseManager, dict]):
     em, ids = expense_manager
 
     # 1) Simple equal split: Alice pays 90 among all
@@ -25,7 +24,7 @@ def test_split_scenario(expense_manager):
     # 3) Exact split: Alice pays 100, exact shares
     p3 = Payment({ids["Alice"]: 100}, {
         ids["Alice"]: 50, ids["Bob"]: 30, ids["Charlie"]: 20
-    }, strategy='exact')
+    }, split_method='exact')
     em.add_payment(p3)
 
     # 4) Subset split: Bob pays 75 split only between Bob and Charlie
@@ -36,12 +35,16 @@ def test_split_scenario(expense_manager):
     p5 = Payment(
         {ids["Alice"]: 40, ids["Bob"]: 20, ids["Charlie"]: 40},
         {ids["Alice"]: 0.25, ids["Bob"]: 0.25, ids["Charlie"]: 0.5},
-        strategy="ratio"
+        split_method="ratio"
     )
     em.add_payment(p5)
 
     # Run settlement
-    net_balances, transactions = em.settle()
+    em.balance_expenses()
+    net_balances = em.get_net_balances()
+    transactions = em.settle()
+    print("Net Balances:", net_balances)
+    print("Transactions:", transactions)
 
     # Check net balances are consistent (they should sum to 0.0)
     total_balance = round(sum(net_balances.values()), 2)
