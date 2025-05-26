@@ -54,6 +54,7 @@ class ExpenseManager:
                 self.people[pid].net_balance -= share
 
     def get_net_balances(self) -> Dict[str, float]:
+        self.balance_expenses()
         return {p.id: p.net_balance for p in self.people.values()}
 
     def settle(self) -> List[Tuple[str, str, float]]:

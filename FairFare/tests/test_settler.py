@@ -49,7 +49,6 @@ def test_settlement_scenario(expense_manager: tuple[ExpenseManager, dict]):
     em.add_payment(p5)
 
     # Run settlement
-    em.balance_expenses()
     net_balances = em.get_net_balances()
     transactions = em.settle()
     print("Net Balances:", net_balances)
