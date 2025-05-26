@@ -1,10 +1,12 @@
 from typing import Dict, List, Tuple
-from FairFare.core import Person, Payment
+
+from FairFare.core import Payment, Person
 from FairFare.utils.settlement.mapping import SETTLEMENT_METHODS_MAPPING
 from FairFare.utils.split.mapping import SPLIT_METHODS_MAPPING
 
+
 class ExpenseManager:
-    def __init__(self, names: List[str], settlement_method: str = 'greedy'):
+    def __init__(self, names: List[str], settlement_method: str = "greedy"):
         self.names = names
         self.payments: List[Payment] = []
         self.settlement_method = settlement_method
@@ -16,11 +18,15 @@ class ExpenseManager:
             raise ValueError("At least one participant is required.")
 
         if any(name is None or name.strip() == "" for name in self.names):
-            raise ValueError("All participant names must be non-empty strings.")
+            raise ValueError(
+                "All participant names must be non-empty strings."
+            )
 
         if self.settlement_method not in SETTLEMENT_METHODS_MAPPING:
-            raise ValueError(f"Unknown settlement_method '{self.settlement_method}'. "
-                             f"Available methods: {list(SETTLEMENT_METHODS_MAPPING.keys())}")
+            raise ValueError(
+                f"Unknown settlement_method '{self.settlement_method}'. "
+                f"Available methods: {list(SETTLEMENT_METHODS_MAPPING.keys())}"
+            )
 
     def initalise_participant_list(self):
         self.people: Dict[str, Person] = {}
@@ -38,10 +44,14 @@ class ExpenseManager:
         # apply payments
         for pay in self.payments:
             if pay.split_method not in SPLIT_METHODS_MAPPING:
-                raise ValueError(f"Unknown split method '{pay.split_method}'. "
-                                 f"Available methods: {list(SPLIT_METHODS_MAPPING.keys())}")
+                raise ValueError(
+                    f"Unknown split method '{pay.split_method}'. "
+                    f"Available methods: {list(SPLIT_METHODS_MAPPING.keys())}"
+                )
 
-            split_shares = SPLIT_METHODS_MAPPING[pay.split_method](pay.total, pay.participant_shares)
+            split_shares = SPLIT_METHODS_MAPPING[pay.split_method](
+                pay.total, pay.participant_shares
+            )
 
             for pid, paid in pay.participant_contributions.items():
                 self.people[pid].net_balance += paid

@@ -1,19 +1,23 @@
-from typing import Dict
 import uuid
 from numbers import Number
+from typing import Dict
+
 
 class Person:
     def __init__(self, name: str):
         self.id: str = str(uuid.uuid4())
         self.name: str = name
-        self.net_balance: float = 0.0  # Positive: should receive; Negative: should pay
+        self.net_balance: float = (
+            0.0  # Positive: should receive; Negative: should pay
+        )
+
 
 class Payment:
     def __init__(
         self,
         participant_contributions: Dict[str, float],
         participant_shares: Dict[str, float],
-        split_method: str = 'even' # Default to even split
+        split_method: str = "even",  # Default to even split
     ):
         """
         participant_contributions: mapping from person id to amount they paid
@@ -31,9 +35,15 @@ class Payment:
     def validate(self):
         if self.total <= 0:
             raise ValueError("Total amount must be larger than 0.")
-        
-        if not any(isinstance(paid, Number) for paid in self.participant_contributions.values()):
+
+        if not any(
+            isinstance(paid, Number)
+            for paid in self.participant_contributions.values()
+        ):
             raise ValueError("Paid values should be numeric.")
 
-        if not any(isinstance(share, Number) for share in self.participant_shares.values()):
+        if not any(
+            isinstance(share, Number)
+            for share in self.participant_shares.values()
+        ):
             raise ValueError("Shares should be numeric.")

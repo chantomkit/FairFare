@@ -1,7 +1,11 @@
 from typing import Dict, List, Tuple
+
 from FairFare.core import Person
 
-def greedy_settlement(people: Dict[str, Person]) -> List[Tuple[str, str, float]]:
+
+def greedy_settlement(
+    people: Dict[str, Person]
+) -> List[Tuple[str, str, float]]:
     """
     Computes the net balances and returns a minimum list of settlements transaction required.
     Each settlement is a tuple (debtor_id, creditor_id, amount).
@@ -9,11 +13,17 @@ def greedy_settlement(people: Dict[str, Person]) -> List[Tuple[str, str, float]]
     total_balance = sum(p.net_balance for p in people.values())
     # Check if the total balance is zero
     if abs(total_balance) > 1e-9:
-        raise ValueError(f"Invalid balances: total net balance is {total_balance}, must be zero")
+        raise ValueError(
+            f"Invalid balances: total net balance is {total_balance}, must be zero"
+        )
 
     # prepare lists
-    positives = [(p.id, p.net_balance) for p in people.values() if p.net_balance > 0]
-    negatives = [(p.id, -p.net_balance) for p in people.values() if p.net_balance < 0]
+    positives = [
+        (p.id, p.net_balance) for p in people.values() if p.net_balance > 0
+    ]
+    negatives = [
+        (p.id, -p.net_balance) for p in people.values() if p.net_balance < 0
+    ]
     positives.sort(key=lambda x: x[1])
     negatives.sort(key=lambda x: x[1])
 
