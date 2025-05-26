@@ -11,7 +11,7 @@ def expense_manager():
     return em, {"Alice": alice, "Bob": bob, "Charlie": charlie}
 
 
-def test_splitwise_scenario(expense_manager):
+def test_split_scenario(expense_manager):
     em, ids = expense_manager
 
     # 1) Simple equal split: Alice pays 90 among all
