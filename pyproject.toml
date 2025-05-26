@@ -1,5 +1,38 @@
+[tool.poetry]
+name = "fairfare"
+version = "0.1.0"
+description = ""
+authors = ["msctomchan@gmail.com"]
+readme = "README.md"
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+]
+
+[tool.poetry.dependencies]
+python = "3.10.17"
+numpy = "1.26.4"
+pandas = "2.2.3"
+scikit-learn = "1.6.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.3.5"
+pre-commit = "4.2.0"
+black = "24.4.0"
+isort = "5.13.2"
+flake8 = "7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
 line-length = 80
 
 [tool.isort]
 profile = "black"
+
+[tool.flake8]
+ignore = "E203, W503"
+max-line-length = 80
