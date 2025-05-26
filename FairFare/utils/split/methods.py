@@ -38,9 +38,9 @@ def ratio_split(
     total: float, participant_shares: Dict[str, float]
 ) -> Dict[str, float]:
     """
-    Split `total` according to the ratio of shares provided in `participant_shares`.
+    Split `total` according to the ratio provided in `participant_shares`.
     :param total: Total amount to be split.
-    :param participant_shares: Mapping from participant id to their share ratio <= 1.
+    :param participant_shares: Mapping from participant id to share ratio.
     :return: Mapping from participant id to owed share amounts.
     """
     if not all(0 <= share <= 1 for share in participant_shares.values()):

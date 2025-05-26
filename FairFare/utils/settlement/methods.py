@@ -7,14 +7,15 @@ def greedy_settlement(
     people: Dict[str, Person]
 ) -> List[Tuple[str, str, float]]:
     """
-    Computes the net balances and returns a minimum list of settlements transaction required.
+    Compute minimum list of settlements transaction using greedy algorithm.
     Each settlement is a tuple (debtor_id, creditor_id, amount).
     """
     total_balance = sum(p.net_balance for p in people.values())
     # Check if the total balance is zero
     if abs(total_balance) > 1e-9:
         raise ValueError(
-            f"Invalid balances: total net balance is {total_balance}, must be zero"
+            f"Invalid balances: total net balance is {total_balance}, \
+                must be zero"
         )
 
     # prepare lists

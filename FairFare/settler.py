@@ -18,9 +18,7 @@ class ExpenseManager:
             raise ValueError("At least one participant is required.")
 
         if any(name is None or name.strip() == "" for name in self.names):
-            raise ValueError(
-                "All participant names must be non-empty strings."
-            )
+            raise ValueError("All participant names must be non-empty strings.")
 
         if self.settlement_method not in SETTLEMENT_METHODS_MAPPING:
             raise ValueError(

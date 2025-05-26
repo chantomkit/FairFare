@@ -22,7 +22,7 @@ class Payment:
         """
         participant_contributions: mapping from person id to amount they paid
         participants: list of person ids among whom to split the cost
-        split_method: 'equal' (default) or 'exact' (shares set via set_exact_shares)
+        split_method: 'even' (default)
         """
         self.participant_contributions = participant_contributions
         self.participant_shares = participant_shares
