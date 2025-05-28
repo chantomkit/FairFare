@@ -1,0 +1,64 @@
+[
+    {
+        "participant_contributions": {
+            "Alice": 90
+        },
+        "participant_shares": {
+            "Alice": 0,
+            "Bob": 0,
+            "Charlie": 0
+        },
+        "split_method": "even",
+        "description": ""
+    },
+    {
+        "participant_contributions": {
+            "Bob": 60,
+            "Charlie": 30
+        },
+        "participant_shares": {
+            "Alice": 0,
+            "Bob": 0,
+            "Charlie": 0
+        },
+        "split_method": "even",
+        "description": ""
+    },
+    {
+        "participant_contributions": {
+            "Alice": 100
+        },
+        "participant_shares": {
+            "Alice": 50,
+            "Bob": 30,
+            "Charlie": 20
+        },
+        "split_method": "exact",
+        "description": ""
+    },
+    {
+        "participant_contributions": {
+            "Bob": 75
+        },
+        "participant_shares": {
+            "Bob": 0,
+            "Charlie": 0
+        },
+        "split_method": "even",
+        "description": ""
+    },
+    {
+        "participant_contributions": {
+            "Alice": 40,
+            "Bob": 20,
+            "Charlie": 40
+        },
+        "participant_shares": {
+            "Alice": 0.25,
+            "Bob": 0.25,
+            "Charlie": 0.5
+        },
+        "split_method": "ratio",
+        "description": ""
+    }
+]

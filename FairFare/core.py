@@ -18,6 +18,7 @@ class Payment:
     participant_contributions: Dict[str, float]
     participant_shares: Dict[str, float]
     split_method: str = "even"
+    description: str = ""
     total: float = field(init=False)
 
     def __post_init__(self):

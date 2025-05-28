@@ -1,52 +1,57 @@
+import json
+from pathlib import Path
+
 import pytest
 
-from FairFare.core import Payment
+from FairFare.core import Payment, Person
 from FairFare.settler import ExpenseManager
 
-
-# Helper to get name-id mapping from names
-@pytest.fixture
-def expense_manager():
-    names = ["Alice", "Bob", "Charlie"]
-    em = ExpenseManager(names)
-    return em, {p.name: p.id for p in em.people.values()}
+TEST_CASES = ["test_case_1", "test_case_2"]
 
 
-def test_settlement_scenario(expense_manager: tuple[ExpenseManager, dict]):
-    em, ids = expense_manager
+def load_test_data(path: str):
+    # Get the absolute path to test_case_1 directory
+    base_dir = Path(__file__).parent.parent
+    test_case_dir = base_dir / "data" / path
 
-    # 1) Simple equal split: Alice pays 90 among all
-    p1 = Payment(
-        {ids["Alice"]: 90}, {ids["Alice"]: 0, ids["Bob"]: 0, ids["Charlie"]: 0}
-    )
-    em.add_payment(p1)
+    # Read names from names.txt
+    names_file = test_case_dir / "names.txt"
+    participant_list = []
+    with open(names_file, "r") as f:
+        for line in f:
+            name, uuid = line.strip().split(", ")
+            participant_list.append(Person(name, uuid))
 
-    # 2) Mixed contributions: Bob 60, Charlie 30 splitting equally among all
-    p2 = Payment(
-        {ids["Bob"]: 60, ids["Charlie"]: 30},
-        {ids["Alice"]: 0, ids["Bob"]: 0, ids["Charlie"]: 0},
-    )
-    em.add_payment(p2)
+    # Read payments from payments.json
+    payments_file = test_case_dir / "payments.json"
+    with open(payments_file, "r") as f:
+        payments_data = json.load(f)
+    payment_list = [Payment(**payment_data) for payment_data in payments_data]
 
-    # 3) Exact split: Alice pays 100, exact shares
-    p3 = Payment(
-        {ids["Alice"]: 100},
-        {ids["Alice"]: 50, ids["Bob"]: 30, ids["Charlie"]: 20},
-        split_method="exact",
-    )
-    em.add_payment(p3)
+    # Read expected net balances
+    expected_net_file = test_case_dir / "expected_net.json"
+    with open(expected_net_file, "r") as f:
+        expected_net = json.load(f)
 
-    # 4) Subset split: Bob pays 75 split only between Bob and Charlie
-    p4 = Payment({ids["Bob"]: 75}, {ids["Bob"]: 0, ids["Charlie"]: 0})
-    em.add_payment(p4)
+    # Read expected transactions
+    expected_transactions_file = test_case_dir / "expected_transactions.json"
+    with open(expected_transactions_file, "r") as f:
+        expected_transactions = json.load(f)
 
-    # 5) Complex multi-payer, multi-participant (ratio split)
-    p5 = Payment(
-        {ids["Alice"]: 40, ids["Bob"]: 20, ids["Charlie"]: 40},
-        {ids["Alice"]: 0.25, ids["Bob"]: 0.25, ids["Charlie"]: 0.5},
-        split_method="ratio",
-    )
-    em.add_payment(p5)
+    return participant_list, payment_list, expected_net, expected_transactions
+
+
+@pytest.mark.parametrize("path", TEST_CASES)
+def test_settlement_scenario(path: str):
+    (
+        participant_list,
+        payment_list,
+        expected_net,
+        expected_transactions,
+    ) = load_test_data(path)
+
+    # Initialize ExpenseManager with names from file
+    em = ExpenseManager(participant_list, payment_list)
 
     # Run settlement
     net_balances = em.get_net_balances()
@@ -60,30 +65,23 @@ def test_settlement_scenario(expense_manager: tuple[ExpenseManager, dict]):
         total_balance == 0.0
     ), f"Net balance does not sum to zero: {total_balance}"
 
-    # Expected net balances
-    expected_net = {"Alice": 95.0, "Bob": 2.5, "Charlie": -97.5}
-    for name, expected in expected_net.items():
-        actual = round(net_balances[ids[name]], 2)
-        assert actual == expected, f"{name}: expected {expected}, got {actual}"
+    # Check net balances match expected values
+    for uuid, expected in expected_net.items():
+        actual = round(net_balances[uuid], 2)
+        assert actual == expected, f"{uuid}: expected {expected}, got {actual}"
 
-    # Expected settlement transactions
-    expected_transactions = [
-        ("Charlie", "Bob", 2.5),
-        ("Charlie", "Alice", 95.0),
-    ]
+    # Check settlement transactions match expected
     assert len(transactions) == len(expected_transactions)
 
-    # Match transactions using name mapping
-    actual_named = [
-        (
-            next(k for k, v in ids.items() if v == debtor),
-            next(k for k, v in ids.items() if v == creditor),
-            amount,
-        )
-        for debtor, creditor, amount in transactions
-    ]
+    # Sort both lists to ensure consistent comparison
+    sorted_transactions = sorted(
+        transactions, key=lambda x: (x["from"], x["to"], x["amount"])
+    )
+    sorted_expected = sorted(
+        expected_transactions, key=lambda x: (x["from"], x["to"], x["amount"])
+    )
 
-    for expected_tx in expected_transactions:
+    for actual, expected in zip(sorted_transactions, sorted_expected):
         assert (
-            expected_tx in actual_named
-        ), f"Expected transaction {expected_tx} not found in {actual_named}"
+            actual == expected
+        ), f"Transaction mismatch: expected {expected}, got {actual}"

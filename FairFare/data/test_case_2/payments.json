@@ -1,0 +1,13 @@
+[
+    {
+        "participant_contributions": {
+            "Alice": 1000
+        },
+        "participant_shares": {
+            "Alice": 0,
+            "Bob": 0
+        },
+        "split_method": "even",
+        "description": ""
+    }
+]

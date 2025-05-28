@@ -1,12 +1,12 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Union
 
 
 def greedy_settlement(
     balances: Dict[str, float]
-) -> List[Tuple[str, str, float]]:
+) -> List[Dict[str, Union[str, float]]]:
     """
     Compute minimum list of settlements transaction using greedy algorithm.
-    Each settlement is a tuple (debtor_id, creditor_id, amount).
+    Each settlement is a dict with keys "from", "to", and "amount".
     """
     total_balance = sum(bal for bal in balances.values())
     # Check if the total balance is zero
@@ -23,12 +23,14 @@ def greedy_settlement(
     negatives.sort(key=lambda x: x[1])
 
     i, j = 0, 0
-    settlements: List[Tuple[str, str, float]] = []
+    settlements: List[Dict[str, Union[str, float]]] = []
     while i < len(negatives) and j < len(positives):
         debtor_id, debt = negatives[i]
         creditor_id, credit = positives[j]
         amount = min(debt, credit)
-        settlements.append((debtor_id, creditor_id, round(amount, 2)))
+        settlements.append(
+            {"from": debtor_id, "to": creditor_id, "amount": round(amount, 2)}
+        )
         debt -= amount
         credit -= amount
         if debt == 0:
