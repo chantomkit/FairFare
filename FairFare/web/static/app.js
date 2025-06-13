@@ -41,7 +41,8 @@ function removeParticipant(name) {
 
 // API Functions
 async function initializeSession() {
-    if (participants.length === 0) {
+    const names = participants;
+    if (names.length === 0) {
         alert('Please add at least one participant');
         return;
     }
@@ -50,14 +51,16 @@ async function initializeSession() {
         const response = await fetch('/api/initialize', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ names: participants })
+            body: JSON.stringify({ names })
         });
 
         if (!response.ok) {
-            throw new Error('Failed to initialize session');
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to initialize session');
         }
 
-        currentSession = await response.json();
+        const data = await response.json();
+        currentSession = data;
         showStep(2);
         updatePayerList();
         updateSplitUI();
@@ -190,6 +193,7 @@ function addExpenseRecord(payment) {
     const recordsDiv = document.getElementById('expenseRecords');
     const recordDiv = document.createElement('div');
     recordDiv.className = 'bg-gray-50 p-3 rounded cursor-pointer hover:bg-gray-100 transition';
+    recordDiv.dataset.id = payment.id;  // Add data-id attribute
     recordDiv.innerHTML = `
         <div class="font-medium">${payment.description}</div>
         <div class="text-sm text-gray-600">
@@ -247,7 +251,12 @@ function loadExpenseForEdit(payment) {
     }, 0);
 }
 
-async function addExpense() {
+function newExpense() {
+    currentExpenseId = null;
+    resetExpenseForm();
+}
+
+async function saveExpense() {
     const description = document.getElementById('expenseDescription').value.trim();
     if (!description) {
         alert('Please enter a description');
@@ -351,20 +360,22 @@ async function addExpense() {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.error || 'Failed to add expense');
+            throw new Error(error.error || 'Failed to save expense');
         }
 
         const result = await response.json();
 
         // Update sidebar
+        const records = document.getElementById('expenseRecords');
         if (currentExpenseId) {
-            // Update existing record
-            const records = document.getElementById('expenseRecords');
-            const record = records.querySelector(`[data-id="${currentExpenseId}"]`);
-            if (record) {
-                record.remove();
+            // Remove the old record
+            const oldRecord = records.querySelector(`[data-id="${currentExpenseId}"]`);
+            if (oldRecord) {
+                oldRecord.remove();
             }
         }
+
+        // Add the new/updated record
         addExpenseRecord(result.payment);
 
         // Reset form to default state
@@ -503,8 +514,25 @@ function togglePaymentRecords() {
 }
 
 function resetSession() {
+    // Clear participants
     participants = [];
     currentSession = null;
+
+    // Reset form
+    document.getElementById('participantList').innerHTML = '';
+    document.getElementById('participantInput').value = '';
+
+    // Reset expense records
+    document.getElementById('expenseRecords').innerHTML = '';
+    currentExpenseId = null;
+
+    // Reset expense form
+    resetExpenseForm();
+
+    // Reset settlement results
+    document.getElementById('netBalances').innerHTML = '';
+    document.getElementById('transactions').innerHTML = '';
+
+    // Show step 1
     showStep(1);
-    updateParticipantList();
 }

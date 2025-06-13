@@ -19,6 +19,7 @@ class Payment:
     input_participant_shares: Dict[str, float]
     split_method: str = "even"
     description: str = ""
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
     total: float = field(init=False)
     split_participant_shares: Dict[str, float] = field(init=False)
 
