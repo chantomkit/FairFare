@@ -3,7 +3,7 @@
         "participant_contributions": {
             "Alice": 1000
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Alice": 0,
             "Bob": 0
         },

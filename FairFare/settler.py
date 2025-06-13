@@ -1,10 +1,7 @@
 from typing import Dict, List, Union
 
 from FairFare.core import Payment, Person
-from FairFare.utils.mappings import (
-    SETTLEMENT_METHODS_MAPPING,
-    SPLIT_METHODS_MAPPING,
-)
+from FairFare.utils.mappings import SETTLEMENT_METHODS_MAPPING
 
 
 class ExpenseManager:
@@ -39,14 +36,10 @@ class ExpenseManager:
         self._reset_net_balances()
         # apply payments
         for pay in self.payment_list:
-            split_shares = SPLIT_METHODS_MAPPING[pay.split_method](
-                pay.total, pay.participant_shares
-            )
-
             for pid, paid in pay.participant_contributions.items():
                 self.id_to_participant[pid].net_balance += paid
             # subtract owed shares
-            for pid, share in split_shares.items():
+            for pid, share in pay.split_participant_shares.items():
                 self.id_to_participant[pid].net_balance -= share
 
     def get_net_balances(self) -> Dict[str, float]:

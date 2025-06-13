@@ -3,7 +3,7 @@
         "participant_contributions": {
             "Alice": 90
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Alice": 0,
             "Bob": 0,
             "Charlie": 0
@@ -16,7 +16,7 @@
             "Bob": 60,
             "Charlie": 30
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Alice": 0,
             "Bob": 0,
             "Charlie": 0
@@ -28,7 +28,7 @@
         "participant_contributions": {
             "Alice": 100
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Alice": 50,
             "Bob": 30,
             "Charlie": 20
@@ -40,7 +40,7 @@
         "participant_contributions": {
             "Bob": 75
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Bob": 0,
             "Charlie": 0
         },
@@ -53,7 +53,7 @@
             "Bob": 20,
             "Charlie": 40
         },
-        "participant_shares": {
+        "input_participant_shares": {
             "Alice": 0.25,
             "Bob": 0.25,
             "Charlie": 0.5

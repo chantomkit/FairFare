@@ -18,16 +18,18 @@ def get_participants() -> List[Person]:
 def get_payment(
     participants: List[Person], id_map: Dict[str, str]
 ) -> Payment | None:
-    print("\nEnter payment details (or type 'STOP' to finish):")
+    print("Enter payment description: (or type 'STOP' to finish)")
+    description = input().strip()
+
+    if description.upper() == "STOP":
+        return None
+
     print(
         "Who paid? (Enter names separated by spaces, \n"
         "followed by their contributions)"
     )
     print("Example: 'Alice 50 Bob 30' means Alice paid 50 and Bob paid 30")
     payer_input = input().strip()
-
-    if payer_input.upper() == "STOP":
-        return None
 
     # Parse payers and amounts
     payer_tokens = payer_input.split()
@@ -42,25 +44,25 @@ def get_payment(
         contributions[id_map[name]] = amount
 
     print("\nHow should it be split?")
-    print("1. Even split among all")
-    print("2. Even split among specific people")
-    print("3. Exact amounts")
-    print("4. Ratio split")
+    print("Default: Even split among all (press enter)")
+    print("1. Even split among specific people")
+    print("2. Exact amounts")
+    print("3. Ratio split")
     split_choice = input().strip()
 
     shares: Dict[str, float] = {}
     split_method = "even"
 
-    if split_choice == "1":
+    if split_choice == "":
         # Even split among all - initialize with 0
         shares = {p.id: 0 for p in participants}
 
-    elif split_choice == "2":
+    elif split_choice == "1":
         print("Enter names of people to split between (space-separated):")
         split_names = input().strip().split()
         shares = {p.id: 0 for p in participants if p.name in split_names}
 
-    elif split_choice == "3":
+    elif split_choice == "2":
         split_method = "exact"
         print("Enter name and exact amount for each person:")
         print("Example: 'Alice 25 Bob 15 Charlie 10'")
@@ -71,7 +73,7 @@ def get_payment(
                 raise ValueError(f"Unknown participant: {name}")
             shares[id_map[name]] = amount
 
-    elif split_choice == "4":
+    elif split_choice == "3":
         split_method = "ratio"
         print("Enter name and ratio for each person (ratios should sum to 1):")
         print("Example: 'Alice 0.5 Bob 0.3 Charlie 0.2'")
@@ -87,8 +89,9 @@ def get_payment(
 
     return Payment(
         participant_contributions=contributions,
-        participant_shares=shares,
+        input_participant_shares=shares,
         split_method=split_method,
+        description=description,
     )
 
 

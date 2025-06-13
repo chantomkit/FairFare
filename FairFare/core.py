@@ -16,19 +16,30 @@ class Person:
 @dataclass
 class Payment:
     participant_contributions: Dict[str, float]
-    participant_shares: Dict[str, float]
+    input_participant_shares: Dict[str, float]
     split_method: str = "even"
     description: str = ""
     total: float = field(init=False)
+    split_participant_shares: Dict[str, float] = field(init=False)
 
     def __post_init__(self):
         # compute total after initialization
-        self.total = sum(self.participant_contributions.values())
         self.validate()
+        self.total = sum(self.participant_contributions.values())
+        self.split_participant_shares = SPLIT_METHODS_MAPPING[
+            self.split_method
+        ](self.total, self.input_participant_shares)
 
     def validate(self):
-        if self.total <= 0:
-            raise ValueError("Total amount must be larger than 0.")
+        if not all(
+            paid >= 0 for paid in self.participant_contributions.values()
+        ):
+            raise ValueError("Paid values should be non-negative.")
+
+        if not all(
+            share >= 0 for share in self.input_participant_shares.values()
+        ):
+            raise ValueError("Share values should be non-negative.")
 
         if not all(
             isinstance(paid, Number)
@@ -38,7 +49,7 @@ class Payment:
 
         if not all(
             isinstance(share, Number)
-            for share in self.participant_shares.values()
+            for share in self.input_participant_shares.values()
         ):
             raise ValueError("Shares should be numeric.")
 
