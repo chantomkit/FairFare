@@ -192,17 +192,24 @@ function updateSplitUI() {
 function addExpenseRecord(payment) {
     const recordsDiv = document.getElementById('expenseRecords');
     const recordDiv = document.createElement('div');
-    recordDiv.className = 'bg-gray-50 p-3 rounded cursor-pointer hover:bg-gray-100 transition';
+    recordDiv.className = 'bg-gray-50 p-3 rounded hover:bg-gray-100 transition';
     recordDiv.dataset.id = payment.id;  // Add data-id attribute
     recordDiv.innerHTML = `
-        <div class="font-medium">${payment.description}</div>
-        <div class="text-sm text-gray-600">
-            ${Object.entries(payment.participant_contributions)
-                .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
-                .join(', ')}
+        <div class="flex justify-between items-start">
+            <div class="flex-1 cursor-pointer" onclick="loadExpenseForEdit(${JSON.stringify(payment).replace(/"/g, '&quot;')})">
+                <div class="font-medium">${payment.description}</div>xw
+                <div class="text-sm text-gray-600">
+                    ${Object.entries(payment.participant_contributions)
+                        .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                        .join(', ')}
+                </div>
+            </div>
+            <button onclick="deleteExpense('${payment.id}')"
+                    class="text-red-600 hover:text-red-800 ml-2 px-2 py-1 rounded hover:bg-red-100">
+                ×
+            </button>
         </div>
     `;
-    recordDiv.onclick = () => loadExpenseForEdit(payment);
     recordsDiv.appendChild(recordDiv);
 }
 
@@ -514,13 +521,16 @@ function togglePaymentRecords() {
 }
 
 function resetSession() {
+    console.log("Resetting session...");
+
     // Clear participants
     participants = [];
     currentSession = null;
 
     // Reset form
     document.getElementById('participantList').innerHTML = '';
-    document.getElementById('participantInput').value = '';
+    const nameInput = document.getElementById('participantName');
+    if (nameInput) nameInput.value = '';
 
     // Reset expense records
     document.getElementById('expenseRecords').innerHTML = '';
@@ -534,5 +544,39 @@ function resetSession() {
     document.getElementById('transactions').innerHTML = '';
 
     // Show step 1
-    showStep(1);
+    if (typeof showStep === 'function') {
+        showStep(1);
+    } else {
+        console.warn('showStep() is not defined');
+    }
+}
+
+async function deleteExpense(paymentId) {
+    if (!confirm('Are you sure you want to delete this expense?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/payments/${paymentId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete expense');
+        }
+
+        // Remove the record from the UI
+        const record = document.querySelector(`#expenseRecords [data-id="${paymentId}"]`);
+        if (record) {
+            record.remove();
+        }
+
+        // If we're currently editing this expense, reset the form
+        if (currentExpenseId === paymentId) {
+            resetExpenseForm();
+            currentExpenseId = null;
+        }
+    } catch (error) {
+        alert(error.message);
+    }
 }

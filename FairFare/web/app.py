@@ -177,6 +177,7 @@ def get_payments():
 
             formatted_payments.append(
                 {
+                    "id": payment.id,
                     "description": payment.description,
                     "participant_contributions": contributions,
                     "participant_shares": shares,
@@ -186,6 +187,25 @@ def get_payments():
             )
 
         return jsonify(formatted_payments)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/payments/<payment_id>", methods=["DELETE"])
+def delete_payment(payment_id):
+    try:
+        session_id = request.cookies.get("session_id", "default")
+        if session_id not in sessions:
+            return jsonify({"error": "No active session"}), 400
+
+        session = sessions[session_id]
+
+        # Remove the payment with the given ID
+        session["payments"] = [
+            p for p in session["payments"] if p.id != payment_id
+        ]
+
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
