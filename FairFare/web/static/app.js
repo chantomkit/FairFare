@@ -246,25 +246,30 @@ function loadExpenseForEdit(payment) {
         payerList.appendChild(payerDiv);
     });
 
-    // Set split method
-    document.getElementById('splitMethod').value = payment.split_method;
+    // Set split method and update UI
+    const splitMethodSelect = document.getElementById('splitMethod');
+    splitMethodSelect.value = payment.split_method;
+
+    // Force a UI update for the split method
     updateSplitUI();
 
-    // Set shares
-    setTimeout(() => {
-        if (payment.split_method === 'even_specific') {
+    // After UI is updated, set the split configuration
+    if (payment.split_method === 'even_specific') {
+        // Wait for the DOM to update with the new split options
+        requestAnimationFrame(() => {
             const checkboxes = document.querySelectorAll('#splitOptions input[type="checkbox"]');
             checkboxes.forEach(cb => {
+                // Check if the participant has a share in the input_participant_shares
                 cb.checked = payment.input_participant_shares[cb.value] !== undefined;
             });
-        } else if (payment.split_method === 'exact' || payment.split_method === 'ratio') {
-            const inputs = document.querySelectorAll('#splitOptions input[type="number"]');
-            inputs.forEach(input => {
-                const name = input.dataset.name;
-                input.value = payment.input_participant_shares[name] || '';
-            });
-        }
-    }, 0);
+        });
+    } else if (payment.split_method === 'exact' || payment.split_method === 'ratio') {
+        const inputs = document.querySelectorAll('#splitOptions input[type="number"]');
+        inputs.forEach(input => {
+            const name = input.dataset.name;
+            input.value = payment.input_participant_shares[name] || '';
+        });
+    }
 }
 
 function newExpense() {

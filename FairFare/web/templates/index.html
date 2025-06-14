@@ -12,29 +12,43 @@
         <h1 class="text-4xl font-bold text-center mb-8 text-indigo-600">FairFare</h1>
 
         <!-- Step 1: Add Participants -->
-        <div id="step1" class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-2xl font-semibold mb-4">Step 1: Add Participants</h2>
-            <div class="flex gap-2">
-                <input type="text" id="participantName" placeholder="Enter name"
-                       class="flex-1 p-2 border rounded">
-                <button onclick="addParticipant()"
-                        class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                    Add
+        <div id="step1">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Add Participants</h2>
+                <button onclick="resetSession()"
+                        class="bg-transparent px-4 py-2 rounded hover:bg-gray-200 flex items-center gap-2">
+                    <span class="text-2xl">🔄</span>
                 </button>
             </div>
-            <div id="participantList" class="mt-4 flex flex-wrap gap-2"></div>
-            <button onclick="initializeSession()"
-                    class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                Start Adding Expenses
-            </button>
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex gap-2">
+                    <input type="text" id="participantName" placeholder="Enter name"
+                           class="flex-1 p-2 border rounded">
+                    <button onclick="addParticipant()"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                        Add
+                    </button>
+                </div>
+                <div id="participantList" class="mt-4 flex flex-wrap gap-2"></div>
+                <button onclick="initializeSession()"
+                        class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Start Adding Expenses
+                </button>
+            </div>
         </div>
 
         <!-- Step 2: Add Expenses -->
         <div id="step2" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Add Expenses</h2>
+                <button onclick="resetSession()"
+                        class="bg-transparent px-4 py-2 rounded hover:bg-gray-200 flex items-center gap-2">
+                    <span class="text-2xl">🔄</span>
+                </button>
+            </div>
             <div class="flex gap-6">
                 <!-- Main Form -->
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold mb-4">Add Expenses</h2>
                     <div class="bg-white p-6 rounded-lg shadow">
                         <div class="mb-4">
                             <label class="block text-gray-700 mb-2">Description</label>
@@ -96,23 +110,25 @@
         </div>
 
         <!-- Step 3: View Results -->
-        <div id="step3" class="bg-white rounded-lg shadow-md p-6 hidden">
-            <h2 class="text-2xl font-semibold mb-4">Step 3: Settlement</h2>
-
-            <div class="mb-6">
-                <h3 class="text-xl font-semibold mb-2">Net Balances</h3>
-                <div id="netBalances" class="space-y-2"></div>
+        <div id="step3" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Settlement</h2>
+                <button onclick="resetSession()"
+                        class="bg-transparent px-4 py-2 rounded hover:bg-gray-200 flex items-center gap-2">
+                    <span class="text-2xl">🔄</span>
+                </button>
             </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2">Net Balances</h3>
+                    <div id="netBalances" class="space-y-2"></div>
+                </div>
 
-            <div>
-                <h3 class="text-xl font-semibold mb-2">Settlement Transactions</h3>
-                <div id="transactions" class="space-y-2"></div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Settlement Transactions</h3>
+                    <div id="transactions" class="space-y-2"></div>
+                </div>
             </div>
-
-            <button onclick="resetSession()"
-                    class="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                Start New Session
-            </button>
         </div>
     </div>
 
