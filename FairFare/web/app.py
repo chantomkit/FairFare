@@ -88,7 +88,7 @@ def add_payment():
                 name_map[pid]: float(amount)
                 for pid, amount in payment.participant_contributions.items()
             },
-            "participant_shares": {
+            "input_participant_shares": {
                 name_map[pid]: float(amount)
                 for pid, amount in payment.input_participant_shares.items()
             },
@@ -180,7 +180,7 @@ def get_payments():
                     "id": payment.id,
                     "description": payment.description,
                     "participant_contributions": contributions,
-                    "participant_shares": shares,
+                    "input_participant_shares": shares,
                     "split_participant_shares": split_shares,
                     "split_method": payment.split_method,
                 }

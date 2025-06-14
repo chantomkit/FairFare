@@ -199,13 +199,19 @@ function addExpenseRecord(payment) {
             <div class="flex-1 cursor-pointer" onclick="loadExpenseForEdit(${JSON.stringify(payment).replace(/"/g, '&quot;')})">
                 <div class="font-medium">${payment.description}</div>
                 <div class="text-sm text-gray-600">
-                    Split: ${payment.split_method.replace('_', ' ')}
-                </div>
-                <div class="text-sm text-gray-600">
                     Paid by: ${Object.entries(payment.participant_contributions)
                         .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
                         .join(', ')}
                 </div>
+                <div class="text-sm text-gray-600">
+                    Split: ${payment.split_method.replace('_', ' ')}
+                </div>
+                <div class="text-sm text-gray-600">Input shares: ${Object.entries(payment.input_participant_shares)
+                    .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                    .join(', ')}</div>
+                <div class="text-sm text-gray-600">Final shares: ${Object.entries(payment.split_participant_shares)
+                    .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                    .join(', ')}</div>
             </div>
             <button onclick="deleteExpense('${payment.id}')"
                     class="text-red-600 hover:text-red-800 ml-2 px-2 py-1 rounded hover:bg-red-100">
@@ -249,13 +255,13 @@ function loadExpenseForEdit(payment) {
         if (payment.split_method === 'even_specific') {
             const checkboxes = document.querySelectorAll('#splitOptions input[type="checkbox"]');
             checkboxes.forEach(cb => {
-                cb.checked = payment.participant_shares[cb.value] !== undefined;
+                cb.checked = payment.input_participant_shares[cb.value] !== undefined;
             });
         } else if (payment.split_method === 'exact' || payment.split_method === 'ratio') {
             const inputs = document.querySelectorAll('#splitOptions input[type="number"]');
             inputs.forEach(input => {
                 const name = input.dataset.name;
-                input.value = payment.participant_shares[name] || '';
+                input.value = payment.input_participant_shares[name] || '';
             });
         }
     }, 0);
@@ -503,7 +509,7 @@ function togglePaymentRecords() {
                                 .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
                                 .join(', ')}</div>
                             <div>Split: ${payment.split_method}</div>
-                            <div>Input shares: ${Object.entries(payment.participant_shares)
+                            <div>Input shares: ${Object.entries(payment.input_participant_shares)
                                 .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
                                 .join(', ')}</div>
                             <div>Final shares: ${Object.entries(payment.split_participant_shares)
