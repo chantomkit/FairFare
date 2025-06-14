@@ -64,6 +64,7 @@ async function initializeSession() {
         showStep(2);
         updatePayerList();
         updateSplitUI();
+        updateExpenseRecords();
     } catch (error) {
         alert(error.message);
     }
@@ -136,10 +137,6 @@ function updateSplitUI() {
 
     switch (splitMethod) {
         case 'even':
-            splitOptions.innerHTML = ''; // No additional options needed
-            break;
-
-        case 'even_specific':
             splitOptions.innerHTML = `
                 <div class="space-y-2">
                     <label class="block text-gray-700">Select participants to split between:</label>
@@ -254,7 +251,7 @@ function loadExpenseForEdit(payment) {
     updateSplitUI();
 
     // After UI is updated, set the split configuration
-    if (payment.split_method === 'even_specific') {
+    if (payment.split_method === 'even') {
         // Wait for the DOM to update with the new split options
         requestAnimationFrame(() => {
             const checkboxes = document.querySelectorAll('#splitOptions input[type="checkbox"]');
@@ -277,7 +274,7 @@ function newExpense() {
     resetExpenseForm();
 }
 
-async function saveExpense() {
+function saveExpense() {
     const description = document.getElementById('expenseDescription').value.trim();
     if (!description) {
         alert('Please enter a description');
@@ -285,19 +282,11 @@ async function saveExpense() {
     }
 
     // Get payers and amounts
-    const payers = [];
-    const amounts = [];
-    document.querySelectorAll('#payerList > div').forEach(div => {
-        const name = div.querySelector('select').value;
-        const amount = parseFloat(div.querySelector('input').value);
-        if (!isNaN(amount)) {
-            payers.push(name);
-            amounts.push(amount);
-        }
-    });
+    const payers = Array.from(document.querySelectorAll('#payerList select')).map(select => select.value);
+    const amounts = Array.from(document.querySelectorAll('#payerList input')).map(input => parseFloat(input.value) || 0);
 
-    if (payers.length === 0) {
-        alert('Please add at least one payer with amount');
+    if (payers.length === 0 || amounts.some(isNaN)) {
+        alert('Please enter valid payer information');
         return;
     }
 
@@ -306,42 +295,23 @@ async function saveExpense() {
     let shares = [];
     let shareAmounts = [];
 
-    switch (splitMethod) {
-        case 'even':
-            shares = participants;
-            shareAmounts = participants.map(() => 0);
-            break;
-
-        case 'even_specific':
-            const selected = Array.from(document.querySelectorAll('#splitOptions input[type="checkbox"]:checked'))
-                .map(cb => cb.value);
-            shares = selected;
-            shareAmounts = selected.map(() => 0);
-            break;
-
-        case 'exact':
-            document.querySelectorAll('#splitOptions input[type="number"]').forEach(input => {
-                const amount = parseFloat(input.value);
-                if (!isNaN(amount)) {
-                    shares.push(input.dataset.name);
-                    shareAmounts.push(amount);
-                }
-            });
-            break;
-
-        case 'ratio':
-            document.querySelectorAll('#splitOptions input[type="number"]').forEach(input => {
-                const ratio = parseFloat(input.value);
-                if (!isNaN(ratio)) {
-                    shares.push(input.dataset.name);
-                    shareAmounts.push(ratio);
-                }
-            });
-            break;
+    if (splitMethod === 'even') {
+        const checkboxes = document.querySelectorAll('#splitOptions input[type="checkbox"]:checked');
+        shares = Array.from(checkboxes).map(cb => cb.value);
+        shareAmounts = shares.map(() => 0); // Use 0 for even split
+    } else if (splitMethod === 'exact' || splitMethod === 'ratio') {
+        const inputs = document.querySelectorAll('#splitOptions input[type="number"]');
+        inputs.forEach(input => {
+            const value = parseFloat(input.value) || 0;
+            if (value > 0) {
+                shares.push(input.dataset.name);
+                shareAmounts.push(value);
+            }
+        });
     }
 
     if (shares.length === 0) {
-        alert('Please specify how to split the expense');
+        alert('Please select at least one participant for splitting');
         return;
     }
 
@@ -364,47 +334,32 @@ async function saveExpense() {
         }
     }
 
-    try {
-        const response = await fetch('/api/add_payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: currentExpenseId,
-                description,
-                payers,
-                amounts,
-                shares,
-                share_amounts: shareAmounts,
-                split_method: splitMethod === 'even_specific' ? 'even' : splitMethod
-            })
-        });
+    const data = {
+        id: currentExpenseId,
+        description,
+        payers,
+        amounts,
+        shares,
+        share_amounts: shareAmounts,
+        split_method: splitMethod
+    };
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to save expense');
+    fetch('/api/add_payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
         }
-
-        const result = await response.json();
-
-        // Update sidebar
-        const records = document.getElementById('expenseRecords');
-        if (currentExpenseId) {
-            // Remove the old record
-            const oldRecord = records.querySelector(`[data-id="${currentExpenseId}"]`);
-            if (oldRecord) {
-                oldRecord.remove();
-            }
-        }
-
-        // Add the new/updated record
-        addExpenseRecord(result.payment);
-
-        // Reset form to default state
         resetExpenseForm();
-        currentExpenseId = null;
-    } catch (error) {
+        updateExpenseRecords();
+    })
+    .catch(error => {
         alert(error.message);
-    }
+    });
 }
 
 function resetExpenseForm() {
@@ -593,4 +548,49 @@ async function deleteExpense(paymentId) {
     } catch (error) {
         alert(error.message);
     }
+}
+
+function updateExpenseRecords() {
+    fetch('/api/payments')
+        .then(response => response.json())
+        .then(payments => {
+            const recordsDiv = document.getElementById('expenseRecords');
+            recordsDiv.innerHTML = ''; // Clear existing records
+
+            payments.forEach(payment => {
+                const recordDiv = document.createElement('div');
+                recordDiv.className = 'bg-gray-50 p-3 rounded hover:bg-gray-100 transition';
+                recordDiv.dataset.id = payment.id;
+                recordDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 cursor-pointer" onclick="loadExpenseForEdit(${JSON.stringify(payment).replace(/"/g, '&quot;')})">
+                            <div class="font-medium">${payment.description}</div>
+                            <div class="text-sm text-gray-600">
+                                Paid by: ${Object.entries(payment.participant_contributions)
+                                    .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                                    .join(', ')}
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                Split: ${payment.split_method.replace('_', ' ')}
+                            </div>
+                            <div class="text-sm text-gray-600">Input shares: ${Object.entries(payment.input_participant_shares)
+                                .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                                .join(', ')}</div>
+                            <div class="text-sm text-gray-600">Final shares: ${Object.entries(payment.split_participant_shares)
+                                .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
+                                .join(', ')}</div>
+                        </div>
+                        <button onclick="deleteExpense('${payment.id}')"
+                                class="text-red-600 hover:text-red-800 ml-2 px-2 py-1 rounded hover:bg-red-100">
+                            ×
+                        </button>
+                    </div>
+                `;
+                recordsDiv.appendChild(recordDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching payments:', error);
+            alert('Failed to update expense records');
+        });
 }
