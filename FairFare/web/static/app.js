@@ -197,9 +197,12 @@ function addExpenseRecord(payment) {
     recordDiv.innerHTML = `
         <div class="flex justify-between items-start">
             <div class="flex-1 cursor-pointer" onclick="loadExpenseForEdit(${JSON.stringify(payment).replace(/"/g, '&quot;')})">
-                <div class="font-medium">${payment.description}</div>xw
+                <div class="font-medium">${payment.description}</div>
                 <div class="text-sm text-gray-600">
-                    ${Object.entries(payment.participant_contributions)
+                    Split: ${payment.split_method.replace('_', ' ')}
+                </div>
+                <div class="text-sm text-gray-600">
+                    Paid by: ${Object.entries(payment.participant_contributions)
                         .map(([name, amount]) => `${name} (${amount.toFixed(2)})`)
                         .join(', ')}
                 </div>
