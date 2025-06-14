@@ -22,7 +22,7 @@ Setup project:
 source setup.sh
 ```
 
-Linting check:
+Linters before commit:
 ```
 poetry run all
 ```
