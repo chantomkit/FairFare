@@ -45,24 +45,24 @@ def get_payment(
 
     print("\nHow should it be split?")
     print("Default: Even split among all (press enter)")
-    print("1. Even split among specific people")
-    print("2. Exact amounts")
-    print("3. Ratio split")
+    print("1. Exact amounts")
+    print("2. Ratio split")
     split_choice = input().strip()
 
     shares: Dict[str, float] = {}
     split_method = "even"
-
     if split_choice == "":
-        # Even split among all - initialize with 0
-        shares = {p.id: 0 for p in participants}
+        print("Press enter to split among all participants")
+        print("Or enter names of people to split between (space-separated):")
+        split_names = input().strip().split()
+        if not split_names:
+            # Default: all participants
+            shares = {p.id: 0 for p in participants}
+        else:
+            # Only specified participants
+            shares = {p.id: 0 for p in participants if p.name in split_names}
 
     elif split_choice == "1":
-        print("Enter names of people to split between (space-separated):")
-        split_names = input().strip().split()
-        shares = {p.id: 0 for p in participants if p.name in split_names}
-
-    elif split_choice == "2":
         split_method = "exact"
         print("Enter name and exact amount for each person:")
         print("Example: 'Alice 25 Bob 15 Charlie 10'")
@@ -73,7 +73,7 @@ def get_payment(
                 raise ValueError(f"Unknown participant: {name}")
             shares[id_map[name]] = amount
 
-    elif split_choice == "3":
+    elif split_choice == "2":
         split_method = "ratio"
         print("Enter name and ratio for each person (ratios should sum to 1):")
         print("Example: 'Alice 0.5 Bob 0.3 Charlie 0.2'")
