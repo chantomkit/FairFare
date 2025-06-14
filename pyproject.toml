@@ -22,18 +22,19 @@ pre-commit = "4.2.0"
 black = "24.4.0"
 isort = "5.13.2"
 flake8 = "7.0.0"
+flake8-pyproject = "^1.2.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 80
+line-length = 120
 
 [tool.isort]
 profile = "black"
-line_length = 80
+line_length = 120
 
 [tool.flake8]
-ignore = ["E203", "W503", "E501"]
-max-line-length = 80
+ignore = "E203 W503 E501"
+max-line-length = 120

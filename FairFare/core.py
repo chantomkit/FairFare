@@ -27,31 +27,21 @@ class Payment:
         # compute total after initialization
         self.validate()
         self.total = sum(self.participant_contributions.values())
-        self.split_participant_shares = SPLIT_METHODS_MAPPING[
-            self.split_method
-        ](self.total, self.input_participant_shares)
+        self.split_participant_shares = SPLIT_METHODS_MAPPING[self.split_method](
+            self.total, self.input_participant_shares
+        )
 
     def validate(self):
-        if not all(
-            paid >= 0 for paid in self.participant_contributions.values()
-        ):
+        if not all(paid >= 0 for paid in self.participant_contributions.values()):
             raise ValueError("Paid values should be non-negative.")
 
-        if not all(
-            share >= 0 for share in self.input_participant_shares.values()
-        ):
+        if not all(share >= 0 for share in self.input_participant_shares.values()):
             raise ValueError("Share values should be non-negative.")
 
-        if not all(
-            isinstance(paid, Number)
-            for paid in self.participant_contributions.values()
-        ):
+        if not all(isinstance(paid, Number) for paid in self.participant_contributions.values()):
             raise ValueError("Paid values should be numeric.")
 
-        if not all(
-            isinstance(share, Number)
-            for share in self.input_participant_shares.values()
-        ):
+        if not all(isinstance(share, Number) for share in self.input_participant_shares.values()):
             raise ValueError("Shares should be numeric.")
 
         if self.split_method not in SPLIT_METHODS_MAPPING:

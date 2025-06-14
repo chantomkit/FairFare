@@ -1,9 +1,7 @@
 from typing import Dict, List, Union
 
 
-def greedy_settlement(
-    balances: Dict[str, float]
-) -> List[Dict[str, Union[str, float]]]:
+def greedy_settlement(balances: Dict[str, float]) -> List[Dict[str, Union[str, float]]]:
     """
     Compute minimum list of settlements transaction using greedy algorithm.
     Each settlement is a dict with keys "from", "to", and "amount".
@@ -28,9 +26,7 @@ def greedy_settlement(
         debtor_id, debt = negatives[i]
         creditor_id, credit = positives[j]
         amount = min(debt, credit)
-        settlements.append(
-            {"from": debtor_id, "to": creditor_id, "amount": round(amount, 2)}
-        )
+        settlements.append({"from": debtor_id, "to": creditor_id, "amount": round(amount, 2)})
         debt -= amount
         credit -= amount
         if debt == 0:

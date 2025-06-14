@@ -47,7 +47,5 @@ class ExpenseManager:
         return {p.id: p.net_balance for p in self.id_to_participant.values()}
 
     def settle(self) -> List[Dict[str, Union[str, float]]]:
-        flows = SETTLEMENT_METHODS_MAPPING[self.settlement_method](
-            self.get_net_balances()
-        )
+        flows = SETTLEMENT_METHODS_MAPPING[self.settlement_method](self.get_net_balances())
         return flows

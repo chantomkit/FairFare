@@ -5,29 +5,21 @@ from FairFare.settler import ExpenseManager
 
 
 def get_participants() -> List[Person]:
-    print(
-        "\nEnter participant names separated by spaces \n"
-        "(e.g. 'Alice Bob Charlie'):"
-    )
+    print("\nEnter participant names separated by spaces \n" "(e.g. 'Alice Bob Charlie'):")
     names = input().strip().split()
     if not names:
         raise ValueError("At least one participant is required")
     return [Person(name) for name in names]
 
 
-def get_payment(
-    participants: List[Person], id_map: Dict[str, str]
-) -> Payment | None:
+def get_payment(participants: List[Person], id_map: Dict[str, str]) -> Payment | None:
     print("Enter payment description: (or type 'STOP' to finish)")
     description = input().strip()
 
     if description.upper() == "STOP":
         return None
 
-    print(
-        "Who paid? (Enter names separated by spaces, \n"
-        "followed by their contributions)"
-    )
+    print("Who paid? (Enter names separated by spaces, \n" "followed by their contributions)")
     print("Example: 'Alice 50 Bob 30' means Alice paid 50 and Bob paid 30")
     payer_input = input().strip()
 

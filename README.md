@@ -10,7 +10,12 @@ Python script to run app:
 python FairFare/runner.py
 ```
 
-Run web app:
+Start the server with Flask web app (dev only):
 ```
 python -m FairFare.web.app
+```
+
+Or Gunicorn Production WSGI Server
+```
+gunicorn --bind 0.0.0.0:8000 FairFare.web.app:app
 ```

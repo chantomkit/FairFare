@@ -61,9 +61,7 @@ def test_settlement_scenario(path: str):
 
     # Check net balances are consistent (they should sum to 0.0)
     total_balance = round(sum(net_balances.values()), 2)
-    assert (
-        total_balance == 0.0
-    ), f"Net balance does not sum to zero: {total_balance}"
+    assert total_balance == 0.0, f"Net balance does not sum to zero: {total_balance}"
 
     # Check net balances match expected values
     for uuid, expected in expected_net.items():
@@ -74,14 +72,8 @@ def test_settlement_scenario(path: str):
     assert len(transactions) == len(expected_transactions)
 
     # Sort both lists to ensure consistent comparison
-    sorted_transactions = sorted(
-        transactions, key=lambda x: (x["from"], x["to"], x["amount"])
-    )
-    sorted_expected = sorted(
-        expected_transactions, key=lambda x: (x["from"], x["to"], x["amount"])
-    )
+    sorted_transactions = sorted(transactions, key=lambda x: (x["from"], x["to"], x["amount"]))
+    sorted_expected = sorted(expected_transactions, key=lambda x: (x["from"], x["to"], x["amount"]))
 
     for actual, expected in zip(sorted_transactions, sorted_expected):
-        assert (
-            actual == expected
-        ), f"Transaction mismatch: expected {expected}, got {actual}"
+        assert actual == expected, f"Transaction mismatch: expected {expected}, got {actual}"

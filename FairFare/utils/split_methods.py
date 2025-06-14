@@ -1,9 +1,7 @@
 from typing import Dict
 
 
-def even_split(
-    total: float, input_participant_shares: Dict[str, float]
-) -> Dict[str, float]:
+def even_split(total: float, input_participant_shares: Dict[str, float]) -> Dict[str, float]:
     """
     Evenly split `total` among `participants`.
     :param total: Total amount to be split.
@@ -14,22 +12,16 @@ def even_split(
     return {pid: per_head for pid in input_participant_shares.keys()}
 
 
-def exact_split(
-    total: float, input_participant_shares: Dict[str, float]
-) -> Dict[str, float]:
+def exact_split(total: float, input_participant_shares: Dict[str, float]) -> Dict[str, float]:
     """
     Split `total` according to shares provided in `input_participant_shares`.
     :param total: Total amount to be split.
     :param input_participant_shares: Mapping participant id to their share.
     :return: Mapping from participant id to owed share amounts.
     """
-    print(
-        total, input_participant_shares, sum(input_participant_shares.values())
-    )
+    print(total, input_participant_shares, sum(input_participant_shares.values()))
 
-    if not all(
-        share is not None for share in input_participant_shares.values()
-    ):
+    if not all(share is not None for share in input_participant_shares.values()):
         raise ValueError("Exact shares must be provided for all participants.")
 
     if abs(sum(input_participant_shares.values()) - total) > 1e-9:
@@ -38,9 +30,7 @@ def exact_split(
     return input_participant_shares
 
 
-def ratio_split(
-    total: float, input_participant_shares: Dict[str, float]
-) -> Dict[str, float]:
+def ratio_split(total: float, input_participant_shares: Dict[str, float]) -> Dict[str, float]:
     """
     Split `total` according to the ratio in `input_participant_shares`.
     :param total: Total amount to be split.
@@ -53,6 +43,4 @@ def ratio_split(
     if abs(sum(input_participant_shares.values()) - 1.0) > 1e-9:
         raise ValueError("Total ratio must equal 1.")
 
-    return {
-        pid: total * share for pid, share in input_participant_shares.items()
-    }
+    return {pid: total * share for pid, share in input_participant_shares.items()}
